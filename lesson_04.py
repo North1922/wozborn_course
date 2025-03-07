@@ -19,11 +19,16 @@
 sum = input('Введите сумму покупки: ')
 cliet_type = input('Введите тип клиента(обычный или VIP)').lower()
 discount = 0
-if sum > 1000:
-    if cliet_type == 'vip':
-        discount = 0.25
-    elif cliet_type == 'обычный':
-        discount = 0.20
+if sum.isdigit():
+    sum = int(sum)
+    if sum > 1000:
+        if cliet_type == 'vip':
+            discount = 0.25
+        elif cliet_type == 'обычный':
+            discount = 0.20
+        else:
+            print('Вы ввели неверный квалификатор клиента')
+            exit()
 
 if sum >= 500 and sum < 1000:
     discount = 0.10
