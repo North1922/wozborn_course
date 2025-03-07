@@ -30,14 +30,14 @@ if sum.isdigit():
             print('Вы ввели неверный квалификатор клиента')
             exit()
 
-if sum >= 500 and sum < 1000:
-    discount = 0.10
+    if sum >= 500 and sum < 1000:
+            discount = 0.10
 
-if sum < 500:
-    discount = 0
-
+    if sum < 500:
+        discount = 0
 else:
-    print('Вы ввели некорректные данные')
+    print('Ошибка! Сумма должна быть введена цифрами')
     exit()
 
-print(f"Ваша итоговая сумма с учётом скидки:{sum * discount}")
+
+print(f"Ваша итоговая сумма с учётом скидки:{sum * (1 - discount)}")
