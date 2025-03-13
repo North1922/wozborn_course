@@ -66,24 +66,30 @@ def monster_choice(): # функция которая генерирует ра�
         print(Fore.MAGENTA + '*Монстр Атакует*' + Fore.RESET)
         return choice
 
-def fight(player_hp, player_damage, player_armor, monster_hp, monster_damage, monster_armor ):
+def fight(player_hp, player_damage, player_armor, monster_hp, monster_damage, monster_armor ):#функция которая реализует бой , между игроком и монстром
     while  True:
-        player_fight = player_choice()
-        monster_fight = monster_choice()
-        match player_fight, monster_fight:
+        player_fight = player_choice()#в переменную помещаем действие которое выбрал игрок
+        monster_fight = monster_choice()#в переменную помещаем рендомно сгенерированное действие монстра
+        match player_fight, monster_fight:# сравниваем значения переменных player_fight и monster_fight через match case
             case 'атака' , 'атака':
-                monster_hp = player_attack(random.randint(0,player_damage), monster_hp)
-                player_hp = monster_attack(random.randint(0,monster_damage), player_hp)
-                check_result(player_hp, monster_hp)
+                monster_hp = player_attack(random.randint(0,player_damage), monster_hp)# нанесение урона монстру. Функция random.randint(0, player_damage) реализована для рандомной генерации урона.
+                player_hp = monster_attack(random.randint(0,monster_damage), player_hp)#нанесекние урона игроку. Функция random.randint(0, player_damage) реализована для рандомной генерации урона.
+                check_result(player_hp, monster_hp)#проверка здоровья игрока и монстра после атак
             case 'атака', 'защита':
-                monster_hp = player_attack(random.randint(0,player_damage), monster_hp, random.randint(0,monster_armor))
-                check_result(player_hp, monster_hp)
+                monster_hp = player_attack(random.randint(0,player_damage), monster_hp, random.randint(0,monster_armor))#нанесение урона монстру
+                check_result(player_hp, monster_hp)#проверка здоровья игрока и монстра после атак
             case 'защита', 'атака':
-                player_hp = monster_attack(random.randint(0,monster_damage), player_hp, random.randint(0,player_armor))
-                check_result(player_hp, monster_hp)
+                player_hp = monster_attack(random.randint(0,monster_damage), player_hp, random.randint(0,player_armor))#нанесение урона человеку
+                check_result(player_hp, monster_hp)#проверка здоровья игрока и монстра после атак
             case 'защита', 'защита':
                 print("**Стоите и смотрите друг на друга прикрывшись щитом**")
                 check_result(player_hp, monster_hp)
+
+            # использование рандомной генерации урона и защиты при помощи random.randint обусловлено тем что во время
+            # драки акатующий не всегда может нанести максимальный урон , например он может промахнуться или попасть в
+            # скользь. По тому же принципу выбрали random.randint длф генерации защиты. Когда защищается человек или
+            # монстр не всегда защита будем максимально эффективна , так как можно поздно среагировать на атаку
+            # соперника или соперник может атаковать через ложную атаку и т.д
 
 print(Fore.LIGHTMAGENTA_EX + "Добро пожаловать в игру про драки с монстром!" + Fore.RESET)
 print(Fore.BLUE + "**********************" + Fore.RESET)
