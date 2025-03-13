@@ -12,14 +12,14 @@ def random_stats():#функция которая генерирует урон 
 def check_result(player_hp: int, monster_hp: int): #функция проверяет остатки здоровья
     if player_hp <= 0:
         print(Fore.RED + "Тебя убили!" + Fore.RESET)
-        print(Fore.GREEN + 'Монстр Побеждает!' + Fore.RESET)
+        print(Fore.LIGHTGREEN_EX + '!!!МОНСТР ПОБЕЖДАЕТ!!! Игра закончена' + Fore.RESET)
         exit()
     elif monster_hp <= 0:
         print(Fore.RED + "Монстр убит!" + Fore.RESET)
-        print(Fore.GREEN + "Ты побеждаешь" + Fore.RESET)
+        print(Fore.LIGHTGREEN_EX + "!!!ТЫ ПОБЕЖДАЕШЬ!!! Игра закончена" + Fore.RESET)
         exit()
     else:
-        print(Fore.BLUE + "**********************" + Fore.RESET)
+        print(Fore.BLUE + "----------------------" + Fore.RESET)
         print(f'Твоё здоровье: {player_hp} ')
         print(f'Здоровье монстра: {monster_hp} ')
         print(Fore.BLUE + "**********************" + Fore.RESET)
@@ -28,7 +28,8 @@ def check_result(player_hp: int, monster_hp: int): #функция провер�
 def monster_attack(monster_damage: int, player_hp: int, player_armor = 0):# функция атаки монстра , возвращает кол-во hp
     # человека которое останется после атаки
     #print('Монстр атакует')
-    player_hp = player_hp - max(monster_damage - player_armor, 0)# функцию max применил для того что бы избежать
+    player_hp = player_hp - max(monster_damage - player_armor, 0)
+    print(f'|||Монстр нанёс: {Fore.RED}{max(monster_damage - player_armor, 0)}{Fore.RESET} урона|||')# функцию max применил для того что бы избежать
     # отрицательного значения, без этой функции иногда если броня была больше чем урон происходило
     # увеличение урона а не уменьшение
     return player_hp
@@ -36,7 +37,8 @@ def monster_attack(monster_damage: int, player_hp: int, player_armor = 0):# фу
 def player_attack(player_damage: int, monster_hp: int, monster_armor: int = 0): # функция атаки человека , возвращает кол-во
     # hp монстра которое останется после атаки человека
     #print('Человек атакует')
-    monster_hp = monster_hp - max(player_damage - monster_armor, 0)# функцию max применил для того что бы избежать
+    monster_hp = monster_hp - max(player_damage - monster_armor, 0)
+    print(f'|||Ты нанёс:{Fore.RED} {max(player_damage - monster_armor, 0)} {Fore.RESET}урона|||')# функцию max применил для того что бы избежать
     # отрицательного значения, без этой функции иногда если броня была больше чем урон происходило
     # увеличение урона а не уменьшение
     return monster_hp
@@ -44,8 +46,9 @@ def player_attack(player_damage: int, monster_hp: int, monster_armor: int = 0): 
 def player_choice(): #функция выбора действия игрока
     while True:
         choice = input(Fore.LIGHTYELLOW_EX + 'Введите ваше действие:' + Fore.RESET + ' Атака/Защита').lower()
+        print(Fore.BLUE + "----------------------" + Fore.RESET)
         if choice == 'атака':
-            print(Fore.LIGHTGREEN_EX + '*Вы Атакуете*' + Fore.RESET)
+            print(Fore.GREEN + '*Вы Атакуете*' + Fore.RESET)
             return choice
         elif choice == 'защита':
             print(Fore.LIGHTBLUE_EX + '*Вы Защищаетесь*' + Fore.RESET)
@@ -60,9 +63,27 @@ def monster_choice(): # функция которая генерирует ра�
         print(Fore.MAGENTA + '*Монстр Защищается*' + Fore.RESET)
         return choice
     elif choice == 'атака':
-        print(Fore.RED + '*Монстр Атакует*' + Fore.RESET)
+        print(Fore.MAGENTA + '*Монстр Атакует*' + Fore.RESET)
         return choice
 
+def fight(player_hp, player_damage, player_armor, monster_hp, monster_damage, monster_armor ):
+    while  True:
+        player_fight = player_choice()
+        monster_fight = monster_choice()
+        match player_fight, monster_fight:
+            case 'атака' , 'атака':
+                monster_hp = player_attack(random.randint(0,player_damage), monster_hp)
+                player_hp = monster_attack(random.randint(0,monster_damage), player_hp)
+                check_result(player_hp, monster_hp)
+            case 'атака', 'защита':
+                monster_hp = player_attack(random.randint(0,player_damage), monster_hp, random.randint(0,monster_armor))
+                check_result(player_hp, monster_hp)
+            case 'защита', 'атака':
+                player_hp = monster_attack(random.randint(0,monster_damage), player_hp, random.randint(0,player_armor))
+                check_result(player_hp, monster_hp)
+            case 'защита', 'защита':
+                print("**Стоите и смотрите друг на друга прикрывшись щитом**")
+                check_result(player_hp, monster_hp)
 
 print(Fore.LIGHTMAGENTA_EX + "Добро пожаловать в игру про драки с монстром!" + Fore.RESET)
 print(Fore.BLUE + "**********************" + Fore.RESET)
@@ -78,29 +99,30 @@ player_damage, player_armor = random_stats()
 print(f'{Fore.LIGHTGREEN_EX}---Игрок создан--- {Fore.RESET}||Здоровье:{player_hp}. Защита:{player_armor}. Урон:{player_damage}||')
 time.sleep(1)
 print(Fore.BLUE + "**********************" + Fore.RESET)
+fight(player_hp, player_damage, player_armor, monster_hp, monster_damage, monster_armor)
 
-while True: #Основной цикл при помощи которого игра работает
-    player_fight = player_choice()# переменная принимает в себя значение функции которая возвращает
-    # действие которое выбрал пользователь
-    monster_fight = monster_choice()# переменная принимает в себя значение функции которая возвращает
-    # сгенерированое действие монстра
-    if player_fight == 'атака' and monster_fight == 'атака':
-        monster_hp = player_attack(player_damage, monster_hp)#функция атаки человека , возвращает кол-во hp
-    # человека которое останется после атаки
-        player_hp = monster_attack(monster_damage, player_hp)#функция атаки монстра , возвращает кол-во hp
-    # человека которое останется после атаки
-        check_result(player_hp, monster_hp)#функция проверяет остатки здоровья
+#while True: #Основной цикл при помощи которого игра работает
+    # player_fight = player_choice()# переменная принимает в себя значение функции которая возвращает
+    # # действие которое выбрал пользователь
+    # monster_fight = monster_choice()# переменная принимает в себя значение функции которая возвращает
+    # # сгенерированое действие монстра
+    # if player_fight == 'атака' and monster_fight == 'атака':
+    #     monster_hp = player_attack(player_damage, monster_hp)#функция атаки человека , возвращает кол-во hp
+    # # человека которое останется после атаки
+    #     player_hp = monster_attack(monster_damage, player_hp)#функция атаки монстра , возвращает кол-во hp
+    # # человека которое останется после атаки
+    #     check_result(player_hp, monster_hp)#функция проверяет остатки здоровья
 
-    elif player_fight == 'атака' and monster_fight == 'защита':
-        monster_hp = player_attack(player_damage, monster_hp, monster_armor)#функция атаки человека , возвращает кол-во hp
-    # человека которое останется после атаки
-        check_result(player_hp, monster_hp)#функция проверяет остатки здоровья
+    # elif player_fight == 'атака' and monster_fight == 'защита':
+    #     monster_hp = player_attack(player_damage, monster_hp, monster_armor)#функция атаки человека , возвращает кол-во hp
+    # # человека которое останется после атаки
+    #     check_result(player_hp, monster_hp)#функция проверяет остатки здоровья
 
-    elif player_fight == 'защита' and monster_fight == 'атака':
-        player_hp = monster_attack(monster_damage, player_hp, player_armor)#функция атаки монстра , возвращает кол-во hp
-    # человека которое останется после атаки
-        check_result(player_hp, monster_hp)#функция проверяет остатки здоровья
+    # elif player_fight == 'защита' and monster_fight == 'атака':
+    #     player_hp = monster_attack(monster_damage, player_hp, player_armor)#функция атаки монстра , возвращает кол-во hp
+    # # человека которое останется после атаки
+    #     check_result(player_hp, monster_hp)#функция проверяет остатки здоровья
 
-    elif player_fight == 'защита' and monster_fight == 'защита':
-        print("**Стоите и смотрите друг на друга прикрывшись щитом**")
-        check_result(player_hp, monster_hp)#функция проверяет остатки здоровья
+    # elif player_fight == 'защита' and monster_fight == 'защита':
+    #     print("**Стоите и смотрите друг на друга прикрывшись щитом**")
+    #     check_result(player_hp, monster_hp)#функция проверяет остатки здоровья
