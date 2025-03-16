@@ -8,30 +8,27 @@ import pickle
 
 
 
-def new_game():
+def new_game(data_conservation: dict) -> dict:
     print(Fore.LIGHTGREEN_EX + 'Создаю Персонажей....' + Fore.RESET)
     print(Fore.BLUE + "**********************" + Fore.RESET)
-    global player_hp
-    player_hp = 100
-    global monster_hp
-    monster_hp = 100
-    global  move_num
-    move_num = 0
-    global monster_damage, monster_armor
-    monster_damage, monster_armor = random_stats()
-    global player_damage, player_armor
-    player_damage, player_armor = random_stats()
-    print(
-        f'{Fore.LIGHTGREEN_EX}---Монстр создан--- {Fore.RESET}'
-        f'||Здоровье:{monster_hp}. '
-        f'Защита:{monster_armor}.'
-        f' Урон:{monster_damage}||')
+
+    data_conservation['player_hp'] = 100
+    data_conservation['player_damage'] = random_stats()
+    data_conservation['player_armor'] = random_stats()
+    data_conservation['monster_hp'] = 100
+    data_conservation['monster_damage'] = random_stats()
+    data_conservation['monster_armor'] = random_stats()
+    data_conservation['move_num'] = 0
+    print("Монстр создан: " +
+          "Здоровье - " + str(data_conservation['monster_hp'])+
+          ". Урон - " + str(data_conservation['monster_damage']) +
+          ". Защита - " + str(data_conservation['monster_armor']))
     time.sleep(0.5)
-    print(
-        f'{Fore.LIGHTGREEN_EX}---Игрок создан--- {Fore.RESET}'
-        f'||Здоровье:{player_hp}. '
-        f'Защита:{player_armor}. '
-        f'Урон:{player_damage}||')
+    print("Игрок создан: " +
+          "Здоровье - " + str(data_conservation['player_hp']) +
+          ". Урон - " + str(data_conservation['player_damage']) +
+          ". Защита - " + str(data_conservation['player_armor']))
+    return data_conservation
 
 
 def loading(file_name:str) -> dict | None:
@@ -50,8 +47,7 @@ def loading(file_name:str) -> dict | None:
                         file_log = json.load(f)
                         return file_log
                 elif choice == 'нет':
-                    file_log = None
-                    return file_log
+                    break
                 else:
                     print('Не верно ввели ответ. Введите да или нет')
         except json.JSONDecodeError as error:
@@ -117,14 +113,13 @@ def save(data: dict, file_name:str):
 def move():
     """функция подсчёта хода"""
     global move_num
-    move_num += 1
+    data_conservation['move_num'] += 1
 
 
 def random_stats():#функция которая генерирует урон и защиту
     """Генерирует урон и защиту"""
-    damage = random.randint(1,20)
-    armor = random.randint(1,20)
-    return damage, armor
+    num = random.randint(1,20)
+    return num
 
 def check_result(player_hp: int, monster_hp: int): #функция проверяет остатки здоровья
     if player_hp <= 0:
@@ -143,13 +138,6 @@ def check_result(player_hp: int, monster_hp: int): #функция провер�
         print(f'Твоё здоровье: {player_hp} ')
         print(f'Здоровье монстра: {monster_hp} ')
         print(Fore.BLUE + "**********************" + Fore.RESET)
-        data_conservation = {
-            'player_hp': player_hp,
-            'player_damage_armor': [player_damage, player_armor],
-            'monster_hp': monster_hp,
-            'monster_damage_armor': [monster_damage, monster_armor],
-            'move number': move_num,
-        }
         save(data_conservation, file_name)
         """через контекстный менеджер записываем логи в файл в этом блоке и так же рассмотреть
          вариант запись логов при завершении игры в результате победы игрока или монстра"""
@@ -185,7 +173,9 @@ def player_choice(): #функция выбора действия игрока
             print(Fore.LIGHTBLUE_EX + '*Вы Защищаетесь*' + Fore.RESET)
             return choice
         elif choice == 'выход':
-            save(data_conservation, file_name)
+            save(data_conservation,file_name)
+            print('Игра завершена.')
+            exit()
         else:
             print(Fore.LIGHTRED_EX + 'Такого варианта нет!' + Fore.RESET)
 
@@ -205,24 +195,24 @@ def fight(player_hp, player_damage, player_armor, monster_hp, monster_damage, mo
         monster_fight = monster_choice()#в переменную помещаем рендомно сгенерированное действие монстра
         match player_fight, monster_fight:# сравниваем значения переменных player_fight и monster_fight через match case
             case 'атака' , 'атака':
-                monster_hp = player_attack(random.randint(0,player_damage), monster_hp)# нанесение урона монстру. Функция random.randint(0, player_damage) реализована для рандомной генерации урона.
-                player_hp = monster_attack(random.randint(0,monster_damage), player_hp)#нанесекние урона игроку. Функция random.randint(0, player_damage) реализована для рандомной генерации урона.#проверка здоровья игрока и монстра после атак
-                if check_result(player_hp, monster_hp):  # Проверка результата
+                data_conservation['monster_hp'] = player_attack(random.randint(0,data_conservation['player_damage']), data_conservation['monster_hp'])# нанесение урона монстру. Функция random.randint(0, player_damage) реализована для рандомной генерации урона.
+                data_conservation['player_hp'] = monster_attack(random.randint(0,data_conservation['monster_damage']), data_conservation['player_hp'])#нанесекние урона игроку. Функция random.randint(0, player_damage) реализована для рандомной генерации урона.#проверка здоровья игрока и монстра после атак
+                if check_result(data_conservation['player_hp'], data_conservation['monster_hp']):  # Проверка результата
                     break
 
             case 'атака', 'защита':
-                monster_hp = player_attack(random.randint(0,player_damage), monster_hp, random.randint(0,monster_armor))#нанесение урона монстру#проверка здоровья игрока и монстра после атак
-                if check_result(player_hp, monster_hp):  # Проверка результата
+                data_conservation['monster_hp'] = player_attack(random.randint(0,data_conservation['player_damage']), data_conservation['monster_hp'], random.randint(0,data_conservation['monster_armor']))#нанесение урона монстру#проверка здоровья игрока и монстра после атак
+                if check_result(data_conservation['player_hp'], data_conservation['monster_hp']):  # Проверка результата
                     break
 
             case 'защита', 'атака':
-                player_hp = monster_attack(random.randint(0,monster_damage), player_hp, random.randint(0,player_armor))#нанесение урона человеку#проверка здоровья игрока и монстра после атак
-                if check_result(player_hp, monster_hp):  # Проверка результата
+                data_conservation['player_hp'] = monster_attack(random.randint(0,data_conservation['monster_damage']), data_conservation['player_hp'], random.randint(0,data_conservation['player_armor']))#нанесение урона человеку#проверка здоровья игрока и монстра после атак
+                if check_result(data_conservation['player_hp'], data_conservation['monster_hp']):  # Проверка результата
                     break
 
             case 'защита', 'защита':
                 print("**Стоите и смотрите друг на друга прикрывшись щитом**")
-                if check_result(player_hp, monster_hp):  # Проверка результата
+                if check_result(data_conservation['player_hp'], data_conservation['monster_hp']):  # Проверка результата
                     break
 
 
@@ -238,30 +228,35 @@ print(Fore.BLUE + "**********************" + Fore.RESET)
 file_name = 'save.json' #название файла который будет использоваться для сохранения промежуточных данных
 file_log = loading(file_name)
 
-player_hp, monster_hp = 100, 100
-move_num = 0
-monster_damage, monster_armor = 0, 0
-player_damage, player_armor = 0, 0
+data_conservation = {'player_hp': 0,
+                     'player_damage': 0,
+                     'player_armor': 0,
+                     'monster_hp': 0,
+                     'monster_damage': 0,
+                     'monster_armor': 0,
+                     'move_num': 0}
+
 
 if file_log is None:
-    new_game()
+    new_game(data_conservation)
 else:
-    player_hp = file_log['player_hp']
-    monster_hp = file_log['monster_hp']
-    player_damage = file_log['player_damage_armor'][0]
-    player_armor = file_log['player_damage_armor'][1]
-    monster_damage = file_log['monster_damage_armor'][0]
-    monster_armor = file_log['monster_damage_armor'][1]
-    move_num = file_log['move number']
-    print('Игра начитнается с места сохранения...')
-    print(f'Твои характеристики: '
-          f'Здоровье: {player_hp}. '
-          f'Урон: {player_damage}. '
-          f'Защита: {player_armor} '
-          f'Характеристики монстра: '
-          f'Здоровье: {monster_hp}. '
-          f'Урон: {monster_damage}. '
-          f'Защита: {monster_armor}')
+    data_conservation['player_hp'] = file_log['player_hp']
+    data_conservation['player_damage'] = file_log['player_damage']
+    data_conservation['player_armor'] = file_log['player_armor']
+    data_conservation['monster_hp'] = file_log['monster_hp']
+    data_conservation['monster_damage'] = file_log['monster_damage']
+    data_conservation['monster_armor'] = file_log['monster_armor']
+    data_conservation['move_num'] = file_log['move_num']
+
+    print('Игра начинается с места сохранения...')
+    print('Твои характеристики: ' +
+          'Здоровье: ' + str(data_conservation['player_hp']) +
+          '. Урон: ' + str(data_conservation['player_damage']) +
+          '. Защита: ' + str(data_conservation['player_armor']) + '.')
+    print('Характеристики монстра: ' +
+          'Здоровье: ' + str(data_conservation['monster_hp']) +
+          '. Урон: ' + str(data_conservation['monster_damage']) +
+          '. Защита: ' + str(data_conservation['monster_armor']) + '.')
 
 
-fight(player_hp, player_damage, player_armor, monster_hp, monster_damage, monster_armor)
+fight(data_conservation['player_hp'], data_conservation['player_damage'], data_conservation['player_armor'], data_conservation['monster_hp'], data_conservation['monster_damage'], data_conservation['monster_armor'])
