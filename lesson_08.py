@@ -240,14 +240,7 @@ data_conservation = {'player_hp': 0,
 if file_log is None:
     new_game(data_conservation)
 else:
-    data_conservation['player_hp'] = file_log['player_hp']
-    data_conservation['player_damage'] = file_log['player_damage']
-    data_conservation['player_armor'] = file_log['player_armor']
-    data_conservation['monster_hp'] = file_log['monster_hp']
-    data_conservation['monster_damage'] = file_log['monster_damage']
-    data_conservation['monster_armor'] = file_log['monster_armor']
-    data_conservation['move_num'] = file_log['move_num']
-
+    data_conservation = file_log
     print('Игра начинается с места сохранения...')
     print('Твои характеристики: ' +
           'Здоровье: ' + str(data_conservation['player_hp']) +
