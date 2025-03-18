@@ -41,3 +41,13 @@ class Monster:
         Проверка, жив ли персонаж.
         """
         return self.hp > 0
+
+    def choice(self):
+        variants = ["защита", "атака"]
+        choice = random.choice(variants)
+        if choice == 'защита':
+            print('*Монстр Защищается*')
+            return choice
+        elif choice == 'атака':
+            print('*Монстр Атакует*')
+            return choice

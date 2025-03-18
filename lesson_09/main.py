@@ -34,6 +34,8 @@ def main():
         monster.display_health()
         print('**********************')
         choice = input("Выберите ваше действие: атака/защита/выход (для сохранения прогресса и выхода из игры)").lower() # Ход игрока
+        print('**********************')
+
 
         if choice == "атака":  # Атака
             player.attack(monster)
@@ -54,7 +56,9 @@ def main():
 
         print(f"\nХод {monster.name}:")# Ход монстра
         time.sleep(1)
-        monster.attack(player)
+        if monster.choice() == 'атака':
+            monster.attack(player)
+
         time.sleep(1)
 
         if not player.is_alive():# Проверяем, жив ли игрок после хода монстра
