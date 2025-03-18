@@ -1,5 +1,8 @@
 import random
 
+from colorama import Fore
+
+
 class Player:
     """
     Класс для игрока.
@@ -15,9 +18,9 @@ class Player:
         Атака цели с учетом случайного урона и защиты.
         """
         damage_dealt = max(0, random.randint(0, self.damage) - random.randint(0, target.armor))
-        print('**********************')
-        print(f"{self.name} атакует {target.name}!")
-        print('**********************')
+        print(f'{Fore.LIGHTYELLOW_EX}------------------------{Fore.RESET}')
+        print(f"{self.name}{Fore.GREEN} атакует{Fore.RESET} {target.name}!")
+        print(f'{Fore.LIGHTYELLOW_EX}------------------------{Fore.RESET}')
         target.take_damage(damage_dealt)
 
     def take_damage(self, amount):
@@ -27,13 +30,13 @@ class Player:
         self.hp -= amount
         if self.hp < 0:
             self.hp = 0
-        print(f"{self.name} получает {amount} урона. Осталось здоровья: {self.hp}")
+        print(f"{self.name} {Fore.LIGHTRED_EX}получает {amount} урона.{Fore.RESET} Осталось здоровья: {self.hp}")
 
     def display_health(self):
         """
         Отображение текущего здоровья.
         """
-        print(f"{self.name}: Здоровье = {self.hp}")
+        print(f"{self.name}: {Fore.LIGHTGREEN_EX}Здоровье{Fore.RESET} = {self.hp}")
 
     def is_alive(self):
         """
